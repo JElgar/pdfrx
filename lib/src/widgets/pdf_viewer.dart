@@ -446,7 +446,8 @@ class _PdfViewerState extends State<PdfViewer>
                           boundaryMargin: widget.params.boundaryMargin ??
                               const EdgeInsets.all(double.infinity),
                           maxScale: widget.params.maxScale,
-                          minScale: _alternativeFitScale != null
+                          // minScale: widget.params.minScale,
+                          minScale: _alternativeFitScale != null && _alternativeFitScale! > 0
                               ? _alternativeFitScale! / 2
                               : 0.1,
                           panAxis: widget.params.panAxis,
@@ -1222,17 +1223,24 @@ class _PdfViewerState extends State<PdfViewer>
   Matrix4 _makeMatrixInSafeRange(Matrix4 newValue) {
     _updateViewSizeAndCoverScale(_viewSize!);
 
+    const minScale = 1.0;
+    const minFractionOnScreen = 0.2;
+
     final position = newValue.calcPosition(_viewSize!);
 
-    final params = widget.params;
+    final newZoom = max(newValue.zoom, minScale);
 
-    final newZoom = params.boundaryMargin != null
-        ? newValue.zoom
-        : max(newValue.zoom, minScale);
     final hw = _viewSize!.width / 2 / newZoom;
     final hh = _viewSize!.height / 2 / newZoom;
-    final x = position.dx.range(hw, _layout!.documentSize.width - hw);
-    final y = position.dy.range(hh, _layout!.documentSize.height - hh);
+
+    final minX = -hw + _layout!.documentSize.width * minFractionOnScreen;
+    final maxX = hw + _layout!.documentSize.width * (1 - minFractionOnScreen);
+
+    final minY= -hh + _layout!.documentSize.height * minFractionOnScreen;
+    final maxY = hh + _layout!.documentSize.height * (1 - minFractionOnScreen);
+
+    final x = position.dx.clamp(minX, maxX);
+    final y = position.dy.clamp(minY, maxY);
 
     return _calcMatrixFor(Offset(x, y), zoom: newZoom, viewSize: _viewSize!);
   }
