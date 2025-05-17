@@ -59,6 +59,7 @@ class PdfViewerParams {
     this.selectableRegionInjector,
     this.perPageSelectableRegionInjector,
     this.forceReload = false,
+    this.canvasRotation = 0,
   });
 
   /// Margin around the page.
@@ -498,6 +499,8 @@ class PdfViewerParams {
   /// Because changing certain fields like functions on [PdfViewerParams] does not run hot-reload on Flutter,
   /// sometimes it is useful to force reload the viewer by setting this to true.
   final bool forceReload;
+
+  final double canvasRotation;
 
   /// Determine whether the viewer needs to be reloaded or not.
   ///

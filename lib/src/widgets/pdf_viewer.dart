@@ -910,6 +910,11 @@ class _PdfViewerState extends State<PdfViewer> with SingleTickerProviderStateMix
         continue;
       }
 
+      final centerPoint = _layout!.pageLayouts[i].center;
+      canvas.translate(centerPoint.dx, centerPoint.dy);
+      canvas.rotate(widget.params.canvasRotation);
+      canvas.translate(-centerPoint.dx, -centerPoint.dy);
+
       final page = _document!.pages[i];
       final realSize = _pageImages[page.pageNumber];
       final partial = _pageImagesPartial[page.pageNumber];
